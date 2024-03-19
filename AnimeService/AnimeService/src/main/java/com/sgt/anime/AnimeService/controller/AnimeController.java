@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/animes")
+@RequestMapping("/anime")
 public class AnimeController {
 
     @Autowired
@@ -30,6 +30,18 @@ public class AnimeController {
     @GetMapping
     public ResponseEntity<List<Anime>> getAllAnimes(){
         return ResponseEntity.status(HttpStatus.OK).body(animeService.getAllAnimes());
+    }
+
+//    @PutMapping("/{animeId}")
+//    public ResponseEntity<Anime> updateAnime(@PathVariable String animeId, @RequestBody Anime updatedBody){
+//        Anime fetchedAnime = animeService.getAnimeById(animeId);
+//        return ResponseEntity.status(HttpStatus.OK).body(animeService.updateAnime(anime));
+//    }
+
+    @DeleteMapping("/{animeId}")
+    public ResponseEntity<Boolean> deleteAnime(@PathVariable String animeId){
+        animeService.deleteAnimeById(animeId);
+        return ResponseEntity.status(HttpStatus.OK).body(true);
     }
 
 }

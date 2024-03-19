@@ -5,14 +5,16 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
 public interface AnimeService {
 
     Anime createAnime(Anime anime);
 
     List<Anime> getAllAnimes();
 
+//    Anime updateAnime(Anime anime);
+
     Anime getAnimeById(String animeId);
 
+    void deleteAnimeById(String animeId);
 
 }

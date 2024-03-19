@@ -1,4 +1,4 @@
-package com.sgt.anime.AnimeService.service.exceptions;
+package com.sgt.anime.AnimeService.exceptions;
 
 public class ResourceNotFoundException extends RuntimeException {
     public ResourceNotFoundException(String s) {

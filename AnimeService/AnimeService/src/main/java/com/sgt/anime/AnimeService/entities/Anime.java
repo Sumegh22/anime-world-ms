@@ -6,20 +6,21 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.stereotype.Service;
 
 @Entity
 @Table(name="anime")
-@Getter
-@Service
 @NoArgsConstructor
 @AllArgsConstructor
+@Setter
+@Getter
 public class Anime {
 
     @Id
-    String idd;
+    String id;
     String name;
     String description;
     String releaseDetails;
-    String desription;
+    String streamLink;
 }
