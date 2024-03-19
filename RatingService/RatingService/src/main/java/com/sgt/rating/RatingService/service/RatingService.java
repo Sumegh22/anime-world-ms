@@ -8,6 +8,10 @@ public interface RatingService {
     //create
     Rating createRating(Rating rating);
 
+    //getALlRatings
+
+    List<Rating> getAllRatings();
+
     //getAllByUserId
     List<Rating> getRatingsByUserId(String userId);
 
