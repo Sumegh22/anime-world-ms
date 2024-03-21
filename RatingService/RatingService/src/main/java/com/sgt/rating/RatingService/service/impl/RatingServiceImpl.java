@@ -17,8 +17,8 @@ public class RatingServiceImpl implements RatingService {
 
     @Override
     public Rating createRating(Rating rating) {
-        String ratingId = UUID.randomUUID().toString();
-        rating.setRatingId(ratingId);
+        Rating rating1 = rating;
+        rating.setRatingId(UUID.randomUUID().toString());
         return repostory.save(rating);
     }
 
