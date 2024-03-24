@@ -16,6 +16,7 @@ public class Rating {
     private String ratingId;
     private String userId;
     private String animeId;
+    private Anime anime;
     private Integer ratedStars;
     private String comments;
 
