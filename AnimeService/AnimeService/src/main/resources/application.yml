@@ -3,7 +3,8 @@ server:
 
 spring:
   application:
-    name: ANIME-SERVICE-MS
+    name: 'ANIME-SERVICE'
+
   datasource:
     url: jdbc:mysql://localhost:3306/anime_microservice
     username: root
@@ -18,3 +19,11 @@ spring:
 #  application:
 #    name: AnimeService
 
+discoveryClient:
+  instance:
+    prefer-ip-address: true
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka

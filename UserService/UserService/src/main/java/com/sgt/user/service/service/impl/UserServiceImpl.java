@@ -46,11 +46,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserById(String userId) {
     User newUser = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User with given id could not be found !..  : "+userId));
-    Rating[] ratingsByThisUser =  restTemplate.getForObject("http://localhost:8083/ratings/users/"+userId, Rating[].class);
+    Rating[] ratingsByThisUser =  restTemplate.getForObject("http://RATING-SERVICE/ratings/users/"+userId, Rating[].class);
     List<Rating> ratings = Arrays.asList(ratingsByThisUser);
 
     List<Rating> allRatingsByUser = ratings.stream().map(rating -> {
-     ResponseEntity<Anime> animeResponseEntity =  restTemplate.getForEntity("http://localhost:8082/anime/"+rating.getAnimeId(), Anime.class);
+     ResponseEntity<Anime> animeResponseEntity =  restTemplate.getForEntity("http://ANIME-SERVICE/anime/"+rating.getAnimeId(), Anime.class);
      Anime anime = animeResponseEntity.getBody();
      rating.setAnime(anime);
      return rating;
