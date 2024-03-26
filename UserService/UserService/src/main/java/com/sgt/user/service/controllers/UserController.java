@@ -2,6 +2,7 @@ package com.sgt.user.service.controllers;
 
 import com.sgt.user.service.entities.User;
 import com.sgt.user.service.service.UserService;
+import jakarta.ws.rs.PUT;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,6 +37,12 @@ public class UserController {
     public ResponseEntity<List<User>> getAllUsers(){
         List<User> allUserList = userService.getAllUsers();
         return ResponseEntity.ok(allUserList);
+    }
+
+    @PutMapping("/{userId}")
+    public ResponseEntity<User> updateUser(@RequestBody User newUser, @PathVariable String userId){
+        User updatedUser = userService.updateUser(userId, newUser);
+        return ResponseEntity.ok(updatedUser);
     }
 
 
