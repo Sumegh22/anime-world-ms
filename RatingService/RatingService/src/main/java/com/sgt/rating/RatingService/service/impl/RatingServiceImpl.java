@@ -36,7 +36,8 @@ public class RatingServiceImpl implements RatingService {
         if(!(repostory.findById(ratingId).isEmpty()) ){
             return false;
         }
-        return repostory.delete(ratingId);
+        repostory.deleteById(ratingId);
+        return true;
     }
 
     @Override
