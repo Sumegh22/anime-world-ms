@@ -11,5 +11,6 @@ public interface RatingRepostory extends MongoRepository<Rating, String> {
 
     List<Rating> findByAnimeId(String animeId);
 
+    boolean delete(String ratingId);
 
 }

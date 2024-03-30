@@ -27,6 +27,18 @@ public ResponseEntity<List<Rating>> getAllRatings(){
     return ResponseEntity.status(HttpStatus.OK).body(ratingService.getAllRatings());
 }
 
+@PutMapping("/ratings/{ratingId}")
+Rating updateRating(@PathVariable("ratingId") String ratingId, Rating newValues){
+
+    return null ;
+}
+
+@DeleteMapping("/ratings/{ratingId}")
+boolean deleteRating(@PathVariable("ratingId") String ratingId){
+    return true;
+}
+
+
 @GetMapping("/users/{userId}")
 public ResponseEntity<List<Rating>> getAllRatingsByUserId(@PathVariable String userId){
     return ResponseEntity.status(HttpStatus.OK).body(ratingService.getRatingsByUserId(userId));

@@ -4,6 +4,7 @@ import com.sgt.rating.RatingService.entities.Rating;
 import com.sgt.rating.RatingService.repository.RatingRepostory;
 import com.sgt.rating.RatingService.service.RatingService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,6 +21,22 @@ public class RatingServiceImpl implements RatingService {
         Rating rating1 = rating;
         rating.setRatingId(UUID.randomUUID().toString());
         return repostory.save(rating);
+    }
+
+    @Override
+    public Rating updateRating(String ratingId, Rating newValues) {
+        Rating ratingToUpdate = repostory.findById(ratingId).get();
+        ratingToUpdate.setComments(newValues.getComments());
+        ratingToUpdate.setRatedStars(newValues.getRatedStars());
+        repostory.save(ratingToUpdate);
+        return ratingToUpdate;
+    }
+    @Override
+    public boolean deleteRating(String ratingId) {
+        if(!(repostory.findById(ratingId).isEmpty()) ){
+            return false;
+        }
+        return repostory.delete(ratingId);
     }
 
     @Override
