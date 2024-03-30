@@ -32,11 +32,10 @@ public class AnimeController {
         return ResponseEntity.status(HttpStatus.OK).body(animeService.getAllAnimes());
     }
 
-//    @PutMapping("/{animeId}")
-//    public ResponseEntity<Anime> updateAnime(@PathVariable String animeId, @RequestBody Anime updatedBody){
-//        Anime fetchedAnime = animeService.getAnimeById(animeId);
-//        return ResponseEntity.status(HttpStatus.OK).body(animeService.updateAnime(anime));
-//    }
+    @PutMapping("/{animeId}")
+    public ResponseEntity<Anime> updateAnime(@PathVariable String animeId, @RequestBody Anime updatedBody){
+        return ResponseEntity.status(HttpStatus.OK).body(animeService.updateAnime(animeId, updatedBody));
+    }
 
     @DeleteMapping("/{animeId}")
     public ResponseEntity<Boolean> deleteAnime(@PathVariable String animeId){

@@ -34,6 +34,17 @@ public class AnimeServiceImpl implements AnimeService {
     }
 
     @Override
+    public Anime updateAnime(String animeId, Anime updatedBody) {
+        Anime fetchedAnime = getAnimeById(animeId);
+        fetchedAnime.setName(updatedBody.getName());
+        fetchedAnime.setDescription(updatedBody.getDescription());
+        fetchedAnime.setStreamLink(updatedBody.getStreamLink());
+        fetchedAnime.setReleaseDetails(updatedBody.getReleaseDetails());
+        animeRepository.save(fetchedAnime);
+        return fetchedAnime;
+    }
+
+    @Override
     public void deleteAnimeById(String animeId) {
         animeRepository.deleteById(animeId);
     }

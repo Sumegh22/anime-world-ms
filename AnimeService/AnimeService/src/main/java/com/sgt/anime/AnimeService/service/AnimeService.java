@@ -11,7 +11,7 @@ public interface AnimeService {
 
     List<Anime> getAllAnimes();
 
-//    Anime updateAnime(Anime anime);
+    Anime updateAnime(String animeId, Anime anime);
 
     Anime getAnimeById(String animeId);
 
