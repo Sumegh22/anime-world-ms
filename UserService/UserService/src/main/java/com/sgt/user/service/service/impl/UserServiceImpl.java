@@ -76,6 +76,17 @@ public class UserServiceImpl implements UserService {
        return fetchedUser;
     }
 
+    @Override
+    public ResponseEntity<User> userRatingFallBackMethod (String userId, Exception e){
+        LOGGER.warn("Exception occurred while trying to load ratings {} ",e.getMessage());
+        LOGGER.warn("Could not load ratings for this user {}, check your rating service health !.. Fall back method called", userId);
+        User thisUser =  getUserById(userId);
+        List<Rating> dummyRating = new ArrayList<>();
+        dummyRating.add(Rating.builder().ratingId("dummyRatingId").ratedStars(0).comments("returned Dummy rating due because rating could not be fetched for: "+userId).build());
+        thisUser.setRatings(dummyRating);
+        return ResponseEntity.ok().body(thisUser);
+    }
+
     public List<Rating> getRatingsByUserId(String userId){
         List<Rating> ratings = ratingServiceExternalClient.getRatingsByUserId(userId);
         List<Rating> allRatingsByUser = ratings.stream().map(rating -> {

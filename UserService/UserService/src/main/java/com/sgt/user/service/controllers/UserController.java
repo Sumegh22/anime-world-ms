@@ -2,6 +2,7 @@ package com.sgt.user.service.controllers;
 
 import com.sgt.user.service.entities.User;
 import com.sgt.user.service.service.UserService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import jakarta.ws.rs.PUT;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +28,15 @@ public class UserController {
 
     // get Single user
     @GetMapping("/{userId}")
+    @CircuitBreaker(name = "userRatingCircuitBreaker", fallbackMethod = "userRatingFallBackMethod")
     public ResponseEntity<User> getUserById(@PathVariable String userId){
         User requestedUser = userService.getUserById(userId);
         return ResponseEntity.ok(requestedUser);
+    }
+
+    public ResponseEntity<User> userRatingFallBackMethod(String userId, Exception e){
+
+        return null;
     }
 
     // get All user

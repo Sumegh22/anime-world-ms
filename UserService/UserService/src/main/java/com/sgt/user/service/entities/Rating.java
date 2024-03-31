@@ -1,9 +1,6 @@
 package com.sgt.user.service.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.annotation.processing.Generated;
 
@@ -11,6 +8,7 @@ import javax.annotation.processing.Generated;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Rating {
 
     private String ratingId;
