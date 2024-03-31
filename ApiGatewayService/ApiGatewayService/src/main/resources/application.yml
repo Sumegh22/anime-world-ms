@@ -6,7 +6,7 @@ spring:
     name: API-GATEWAY
 
   config:
-    import: optiona:configserver:http://localhost:8085
+    import: optional:configserver:http://localhost:8085
   profiles:
     active: prod
 
