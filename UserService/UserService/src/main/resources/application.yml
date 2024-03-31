@@ -6,7 +6,7 @@ spring:
     name: USER-SERVICE
 
   config:
-    import: optiona;:configserver://localhost:8085
+    import: optiona:configserver:http://localhost:8085
   profiles:
     active: prod
 
