@@ -16,6 +16,7 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
 
+    private static final String USER_SERVICE_CB = "userServiceCircuitBreaker";
     @Autowired
     private UserService userService;
 
@@ -28,22 +29,25 @@ public class UserController {
 
     // get Single user
     @GetMapping("/{userId}")
-    @CircuitBreaker(name = "userRatingCircuitBreaker", fallbackMethod = "userRatingFallBackMethod")
+    @CircuitBreaker(name = USER_SERVICE_CB, fallbackMethod = "singleUserRatingsFallBackMethod")
     public ResponseEntity<User> getUserById(@PathVariable String userId){
         User requestedUser = userService.getUserById(userId);
         return ResponseEntity.ok(requestedUser);
     }
-
-    public ResponseEntity<User> userRatingFallBackMethod(String userId, Exception e){
-
-        return null;
-    }
-
     // get All user
     @GetMapping
+    @CircuitBreaker(name = USER_SERVICE_CB, fallbackMethod = "allUsersRatingsFallBackMethod")
     public ResponseEntity<List<User>> getAllUsers(){
         List<User> allUserList = userService.getAllUsers();
         return ResponseEntity.ok(allUserList);
+    }
+
+    public ResponseEntity<User> singleUserRatingsFallBackMethod(String userId, Exception exception){
+        return  ResponseEntity.ok(userService.singleUserRatingsFallBackMethod(userId, exception));
+    }
+
+    public ResponseEntity<List<User>> allUsersRatingsFallBackMethod(Exception exception){
+        return  ResponseEntity.ok(userService.allUsersRatingsFallBackMethod(exception));
     }
 
     @PutMapping("/{userId}")
@@ -52,5 +56,9 @@ public class UserController {
         return ResponseEntity.ok(updatedUser);
     }
 
+    @DeleteMapping("/{userId}")
+    boolean deleteUserById(@PathVariable String userId){
+        return userService.deleteUserById(userId);
+    }
 
 }

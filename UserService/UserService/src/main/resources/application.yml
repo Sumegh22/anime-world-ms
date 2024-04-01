@@ -39,13 +39,13 @@ management:
 resilience4j:
   circuitbreaker:
     instances:
-      userRatingFallBackMethod:
+      userServiceCircuitBreaker:
         registerHealthIndicator: true
         eventConsumerBufferSize: 10
-        failureRateThreshold: 50
+        failureRateThreshold: 5
         minimumNumberOfCalls: 5
-        automaticTransitionFromHalfOpenToOpen: true
+        automaticTransitionFromOpenToHalfOpenEnabled: true
         weightDurationInOpenState: 5s
-        permitterNumberOfCallsInHalfOpenState: 3
+        permittedNumberOfCallsInHalfOpenState: 3
         slidingWindowSize: 10
         slidingWindowType: COUNT_BASED

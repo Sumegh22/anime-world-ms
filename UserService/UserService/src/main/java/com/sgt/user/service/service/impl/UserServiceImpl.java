@@ -8,23 +8,21 @@ import com.sgt.user.service.external.services.AnimeServiceExternalClient;
 import com.sgt.user.service.external.services.RatingServiceExternalClient;
 import com.sgt.user.service.repositories.UserRepository;
 import com.sgt.user.service.service.UserService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
-
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -34,6 +32,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     RatingServiceExternalClient ratingServiceExternalClient;
     Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
+
 
     @Override
     public User saveUser(User user) {
@@ -49,8 +48,8 @@ public class UserServiceImpl implements UserService {
             user.setRatings(getRatingsByUserId(user.getUserId()));
         });
         return allUsers;
-    }
 
+    }
     @Override
     public User getUserById(String userId) {
     User newUser = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User with given id could not be found !..  : "+userId));
@@ -59,10 +58,33 @@ public class UserServiceImpl implements UserService {
     newUser.setRatings(allRatingsByUser);
     return newUser;
     }
-
     @Override
-    public boolean deleteUser(String userId) {
-        return false;
+    public User singleUserRatingsFallBackMethod(String userId, Exception exception) {
+        LOGGER.warn("Exception occurred while trying to load ratings: {} ", exception.getMessage());
+        Optional<User> thisUser = userRepository.findById(userId);
+        if (thisUser.isPresent()) thisUser.get().setRatings(setDummyRatingsForFallBacks(userId));
+        else {
+            throw new ResourceNotFoundException("user with given userId not found"+ userId);
+        }
+        return thisUser.get();
+    }
+    @Override
+    public List<User> allUsersRatingsFallBackMethod(Exception exception) {
+        LOGGER.warn("Exception occurred while trying to load ratings: {} ", exception.getMessage());
+        List<User> allUsers = userRepository.findAll();
+        allUsers.stream().forEach(user -> {
+            user.setRatings(setDummyRatingsForFallBacks(user.getUserId()));
+        });
+        return allUsers;
+    }
+    @Override
+    public boolean deleteUserById(String userId) {
+        boolean flag = false;
+        if(userRepository.findById(userId).isPresent()){
+            userRepository.deleteById(userId);
+            flag = true;
+        }
+        return flag;
     }
 
     @Override
@@ -76,16 +98,14 @@ public class UserServiceImpl implements UserService {
        return fetchedUser;
     }
 
-    @Override
-    public ResponseEntity<User> userRatingFallBackMethod (String userId, Exception e){
-        LOGGER.warn("Exception occurred while trying to load ratings {} ",e.getMessage());
-        LOGGER.warn("Could not load ratings for this user {}, check your rating service health !.. Fall back method called", userId);
+    public List<Rating> setDummyRatingsForFallBacks (String userId){
+        LOGGER.warn("Could not load ratings for all user: {}, check your rating service !.. Fall back method called", userId);
         User thisUser =  getUserById(userId);
         List<Rating> dummyRating = new ArrayList<>();
         dummyRating.add(Rating.builder().ratingId("dummyRatingId").ratedStars(0).comments("returned Dummy rating due because rating could not be fetched for: "+userId).build());
-        thisUser.setRatings(dummyRating);
-        return ResponseEntity.ok().body(thisUser);
+        return dummyRating;
     }
+
 
     public List<Rating> getRatingsByUserId(String userId){
         List<Rating> ratings = ratingServiceExternalClient.getRatingsByUserId(userId);
@@ -96,6 +116,21 @@ public class UserServiceImpl implements UserService {
         }).collect(Collectors.toList()) ;
         return allRatingsByUser;
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //    public List<Rating> getRatingsByUserId(String userId){
 //        Rating[] ratingsByThisUser =  restTemplate.getForObject("http://RATING-SERVICE/ratings/users/"+userId, Rating[].class);

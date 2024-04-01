@@ -12,9 +12,10 @@ public interface UserService {
     User saveUser(User user);
     List<User> getAllUsers();
     User getUserById(String userId);
-    boolean deleteUser(String userId);
     User updateUser(String userId, User user);
-    ResponseEntity<User> userRatingFallBackMethod(String userId, Exception e);
+    boolean deleteUserById(String userId);
+    User singleUserRatingsFallBackMethod(String userId, Exception exception);
+    List<User> allUsersRatingsFallBackMethod(Exception exception);
 
 
 }
