@@ -2,6 +2,7 @@ package com.sgt.user.service.external.services;
 
 import com.sgt.user.service.entities.Anime;
 import com.sgt.user.service.entities.User;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +17,7 @@ public interface AnimeServiceExternalClient {
     @GetMapping("/anime/{animeId}")
     Anime getAnime(@PathVariable("animeId") String animeId);
 
-    @GetMapping("/animes")
+    @GetMapping("/anime")
     ResponseEntity<List<Anime>> getAllAnimes();
 
 

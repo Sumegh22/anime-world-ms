@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 
 import java.util.List;
 
+
 @FeignClient(name = "RATING-SERVICE")
 public interface RatingServiceExternalClient {
 

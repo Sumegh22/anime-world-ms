@@ -4,18 +4,15 @@ server:
 spring:
   application:
     name: USER-SERVICE
-
   config:
     import: optional:configserver:http://localhost:8085
   profiles:
     active: prod
-
   datasource:
     url: jdbc:mysql://localhost:3306/user_microservice
     username: root
     password: rootpass
     driver-class-name: com.mysql.cj.jdbc.Driver
-
   jpa:
     hibernate:
       ddl-auto: update
@@ -24,10 +21,14 @@ spring:
 #      hibernate:
 #        dialect: org.hibernate.dialect.MySQL8Dialect
 
+feign:
+  circuitbreaker:
+    enabled: true
+
 management:
-  health:
-    circuitbreakers:
-      enabled: true
+#  health:
+#    circuitbreakers:
+#      enabled: true
   endpoints:
     web:
       exposure:
@@ -39,13 +40,15 @@ management:
 resilience4j:
   circuitbreaker:
     instances:
-      userServiceCircuitBreaker:
-        registerHealthIndicator: true
-        eventConsumerBufferSize: 10
-        failureRateThreshold: 5
-        minimumNumberOfCalls: 5
-        automaticTransitionFromOpenToHalfOpenEnabled: true
-        weightDurationInOpenState: 5s
-        permittedNumberOfCallsInHalfOpenState: 3
-        slidingWindowSize: 10
-        slidingWindowType: COUNT_BASED
+      userRatingBreaker:
+        external:
+          registerHealthIndicator: true
+          eventConsumerBufferSize: 10
+          failureRateThreshold: 5
+          minimumNumberOfCalls: 5
+          automaticTransitionFromOpenToHalfOpenEnabled: true
+          weightDurationInOpenState: 5s
+          permittedNumberOfCallsInHalfOpenState: 3
+          slidingWindowSize: 10
+          slidingWindowType: COUNT_BASED
+      allUserRatingsBreaker:

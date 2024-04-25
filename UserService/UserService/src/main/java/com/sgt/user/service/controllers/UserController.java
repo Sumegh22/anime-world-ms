@@ -1,24 +1,29 @@
 package com.sgt.user.service.controllers;
 
+import com.sgt.user.service.entities.Rating;
 import com.sgt.user.service.entities.User;
 import com.sgt.user.service.service.UserService;
+import com.sgt.user.service.service.impl.UserServiceImpl;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
-import jakarta.ws.rs.PUT;
-import lombok.Getter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 @RequestMapping("/users")
 public class UserController {
 
-    private static final String USER_SERVICE_CB = "userServiceCircuitBreaker";
     @Autowired
     private UserService userService;
+
+    Logger LOGGER = LoggerFactory.getLogger(UserController.class);
+
 
     //create
     @PostMapping
@@ -29,36 +34,45 @@ public class UserController {
 
     // get Single user
     @GetMapping("/{userId}")
-    @CircuitBreaker(name = USER_SERVICE_CB, fallbackMethod = "singleUserRatingsFallBackMethod")
+    @CircuitBreaker(name="userRatingBreaker", fallbackMethod = "sendDummyAnimeRatingsForUser")
     public ResponseEntity<User> getUserById(@PathVariable String userId){
         User requestedUser = userService.getUserById(userId);
         return ResponseEntity.ok(requestedUser);
     }
     // get All user
     @GetMapping
-    @CircuitBreaker(name = USER_SERVICE_CB, fallbackMethod = "allUsersRatingsFallBackMethod")
     public ResponseEntity<List<User>> getAllUsers(){
         List<User> allUserList = userService.getAllUsers();
         return ResponseEntity.ok(allUserList);
     }
-
-    public ResponseEntity<User> singleUserRatingsFallBackMethod(String userId, Exception exception){
-        return  ResponseEntity.ok(userService.singleUserRatingsFallBackMethod(userId, exception));
-    }
-
-    public ResponseEntity<List<User>> allUsersRatingsFallBackMethod(Exception exception){
-        return  ResponseEntity.ok(userService.allUsersRatingsFallBackMethod(exception));
-    }
-
     @PutMapping("/{userId}")
     public ResponseEntity<User> updateUser(@RequestBody User newUser, @PathVariable String userId){
         User updatedUser = userService.updateUser(userId, newUser);
         return ResponseEntity.ok(updatedUser);
     }
-
     @DeleteMapping("/{userId}")
     boolean deleteUserById(@PathVariable String userId){
         return userService.deleteUserById(userId);
     }
+
+    public ResponseEntity<User> sendDummyAnimeRatingsForUser(String userId, Exception ex){
+        LOGGER.warn("Fallback is getting executed as the service is down: {}", ex);
+        List<Rating> dummyRatings = new ArrayList<>();
+//        userService.getUserById(userId);
+        dummyRatings.add(new Rating("DummyRating",userId, "DummyAnimeId", null, 0,"This is a dummy rating, which is loaded because service is down"));
+        User dummyUser =  User.builder().userId(userId).name("DummyName").email("test@email.com").ratings(dummyRatings).build();
+        return ResponseEntity.ok(dummyUser);
+    }
+
+    public ResponseEntity<List<User>> sendDummyAnimeRatingsForAllUsers(String userId, Exception ex){
+        LOGGER.warn("Fallback is getting executed as the service is down: {}", ex);
+        List<User> allUsers = userService.getAllUsers();
+        List<Rating> dummyRatings = new ArrayList<>();
+        dummyRatings.add(new Rating("DummyRating",userId, "DummyAnimeId", null, 0,"This is a dummy rating, which is loaded because service is down"));
+        List<User> tempUserlist = List.copyOf(allUsers);
+        tempUserlist.stream().forEach( u -> u.setRatings(dummyRatings));
+        return ResponseEntity.ok(tempUserlist);
+    }
+
 
 }
