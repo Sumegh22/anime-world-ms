@@ -13,5 +13,6 @@ public interface UserService {
     User getUserById(String userId);
     User updateUser(String userId, User user);
     boolean deleteUserById(String userId);
+    List<User> getOnlyUserListForFallBack();
 
 }

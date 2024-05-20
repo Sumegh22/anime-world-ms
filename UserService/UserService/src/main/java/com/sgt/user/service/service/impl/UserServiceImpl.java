@@ -39,7 +39,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @CircuitBreaker(name="userRatingBreaker", fallbackMethod = "sendUsersWithDummyRatings")
     public List<User> getAllUsers() {
         List<User> allUsers = userRepository.findAll();
         allUsers.stream().forEach(user -> {
@@ -77,13 +76,7 @@ public class UserServiceImpl implements UserService {
        userRepository.save(fetchedUser);
        return fetchedUser;
     }
-    public List<Rating> setDummyRatingsForFallBacks (String userId){
-        LOGGER.warn("Could not load ratings for all user: {}, check your rating service !.. Fall back method called", userId);
-        User thisUser =  getUserById(userId);
-        List<Rating> dummyRating = new ArrayList<>();
-        dummyRating.add(Rating.builder().ratingId("dummyRatingId").ratedStars(0).comments("returned Dummy rating due because rating could not be fetched for: "+userId).build());
-        return dummyRating;
-    }
+
     public List<Rating> getRatingsByUserId(String userId){
         List<Rating> ratings = ratingServiceExternalClient.getRatingsByUserId(userId);
         List<Rating> allRatingsByUser = ratings.stream().map(rating -> {
@@ -93,13 +86,10 @@ public class UserServiceImpl implements UserService {
         }).collect(Collectors.toList()) ;
         return allRatingsByUser;
     }
-    public List<User> sendUsersWithDummyRatings() {
-        List<User> allUsers = userRepository.findAll();
-        List<Rating> dummyRatings = new ArrayList<>();
-        dummyRatings.add(new Rating("DummyRating","dummyUID", "DummyAnimeId", null, 0,"This is a dummy rating, which is loaded because service is down"));
-        List<User> tempUserlist = List.copyOf(allUsers);
-        tempUserlist.stream().forEach( u -> u.setRatings(dummyRatings));
-        return allUsers;
+
+    @Override
+    public List<User> getOnlyUserListForFallBack() {
+        return userRepository.findAll();
     }
 
 

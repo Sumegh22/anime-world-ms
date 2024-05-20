@@ -51,4 +51,15 @@ resilience4j:
           permittedNumberOfCallsInHalfOpenState: 3
           slidingWindowSize: 10
           slidingWindowType: COUNT_BASED
+
       allUserRatingsBreaker:
+        external:
+          registerHealthIndicator: true
+          eventConsumerBufferSize: 10
+          failureRateThreshold: 5
+          minimumNumberOfCalls: 5
+          automaticTransitionFromOpenToHalfOpenEnabled: true
+          weightDurationInOpenState: 5s
+          permittedNumberOfCallsInHalfOpenState: 3
+          slidingWindowSize: 10
+          slidingWindowType: COUNT_BASED

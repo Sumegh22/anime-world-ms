@@ -39,12 +39,15 @@ public class UserController {
         User requestedUser = userService.getUserById(userId);
         return ResponseEntity.ok(requestedUser);
     }
+
     // get All user
     @GetMapping
+    @CircuitBreaker(name="allUserRatingsBreaker", fallbackMethod = "sendDummyAnimeRatingsForAllUsers")
     public ResponseEntity<List<User>> getAllUsers(){
         List<User> allUserList = userService.getAllUsers();
         return ResponseEntity.ok(allUserList);
     }
+
     @PutMapping("/{userId}")
     public ResponseEntity<User> updateUser(@RequestBody User newUser, @PathVariable String userId){
         User updatedUser = userService.updateUser(userId, newUser);
@@ -63,12 +66,11 @@ public class UserController {
         User dummyUser =  User.builder().userId(userId).name("DummyName").email("test@email.com").ratings(dummyRatings).build();
         return ResponseEntity.ok(dummyUser);
     }
-
-    public ResponseEntity<List<User>> sendDummyAnimeRatingsForAllUsers(String userId, Exception ex){
+    public ResponseEntity<List<User>> sendDummyAnimeRatingsForAllUsers(Exception ex){
         LOGGER.warn("Fallback is getting executed as the service is down: {}", ex);
-        List<User> allUsers = userService.getAllUsers();
+        List<User> allUsers = userService.getOnlyUserListForFallBack();
         List<Rating> dummyRatings = new ArrayList<>();
-        dummyRatings.add(new Rating("DummyRating",userId, "DummyAnimeId", null, 0,"This is a dummy rating, which is loaded because service is down"));
+        dummyRatings.add(new Rating("DummyRating","dummyId", "DummyAnimeId", null, 0,"This is a dummy rating, which is loaded because service is down"));
         List<User> tempUserlist = List.copyOf(allUsers);
         tempUserlist.stream().forEach( u -> u.setRatings(dummyRatings));
         return ResponseEntity.ok(tempUserlist);
